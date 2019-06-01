@@ -31,11 +31,9 @@ class CIFARLoader():
         """
         for split in ['train', 'test']:
             if split == 'train':
-                self.dataloader[split] = DataLoader(self.train_set, batch_size=batch_size,
-                                                    sampler=SubsetRandomSampler(list(range(10000))))
+                self.dataloader[split] = DataLoader(self.train_set, batch_size=batch_size, shuffle=True)
             if split == 'test':
-                self.dataloader[split] = DataLoader(self.test_set, batch_size=batch_size,
-                                                    sampler=SubsetRandomSampler(list(range(10000))))
+                self.dataloader[split] = DataLoader(self.test_set, batch_size=batch_size, shuffle=True)
 
         return self.dataloader
 

@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.autograd.variable import Variable
+import numpy as np
 
 from models.data_loader import CIFARLoader
 from models.model import Net
@@ -39,6 +40,8 @@ def evaluate(model, datasetloader, loss_fn, batch_size=4):
     dataloader = datasetloader.get_dataloader(batch_size)['test']
     model.eval()
 
+    batch_accuracy = []
+
     running_loss = 0.0
     with torch.no_grad():
         for data_batch, labels_batch in dataloader:
@@ -49,7 +52,9 @@ def evaluate(model, datasetloader, loss_fn, batch_size=4):
             output_batch = model(data_batch)
             loss = loss_fn(output_batch, labels_batch)
             running_loss += loss.item()
-            print("Accuracy: ", accuracy(output_batch, labels_batch))
+            batch_accuracy.append(accuracy(output_batch, labels_batch))
+        mean_accuracy = np.mean(batch_accuracy)
+        print("Mean accuracy {}".format(mean_accuracy))
 
 
 def accuracy(outputs, labels):
@@ -74,5 +79,5 @@ if __name__ == "__main__":
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
 
-    train(net, dataloader, loss_fn, optimizer, 4, 3)
-    evaluate(net, dataloader, loss_fn, 4)
+    train(net, dataloader, loss_fn, optimizer, 16, 10)
+    evaluate(net, dataloader, loss_fn, 16)
