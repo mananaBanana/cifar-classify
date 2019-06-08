@@ -5,10 +5,11 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 
 class CIFARLoader():
-    def __init__(self, dataset_type='CIFAR10', root='./data/CIFAR10', transform_list=[transforms.ToTensor()]):
+    def __init__(self, dataset_type='CIFAR10', root='./data/CIFAR10', sample=False, transform_list=[transforms.ToTensor()]):
         self.transform_list = transform_list
         self.dataloader = {}
         self.classlist = ['plane', 'car', 'bird', 'cat', 'deer', 'dog', 'frog', 'horse', 'ship', 'truck']
+        self.sample = sample
 
         if dataset_type == 'CIFAR10':
             self.train_set = torchvision.datasets.CIFAR10(
@@ -31,9 +32,17 @@ class CIFARLoader():
         """
         for split in ['train', 'test']:
             if split == 'train':
-                self.dataloader[split] = DataLoader(self.train_set, batch_size=batch_size, shuffle=True)
+                if self.sample:
+                    self.dataloader[split] = DataLoader(self.train_set, batch_size=batch_size,
+                                                        sampler=SubsetRandomSampler(list(range(1000))))
+                else:
+                    self.dataloader[split] = DataLoader(self.train_set, batch_size=batch_size, shuffle=True)
             if split == 'test':
-                self.dataloader[split] = DataLoader(self.test_set, batch_size=batch_size, shuffle=True)
+                if self.sample:
+                    self.dataloader[split] = DataLoader(self.test_set, batch_size=batch_size,
+                                                        sampler=SubsetRandomSampler(list(range(1000))))
+                else:
+                    self.dataloader[split] = DataLoader(self.test_set, batch_size=batch_size, shuffle=True)
 
         return self.dataloader
 

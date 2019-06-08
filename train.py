@@ -4,6 +4,7 @@ import torch.optim as optim
 import torchvision.transforms as transforms
 from torch.autograd.variable import Variable
 import numpy as np
+import matplotlib.pyplot as plt
 
 from models.data_loader import CIFARLoader
 from models.model import Net
@@ -18,6 +19,7 @@ def train(model, datasetloader, loss_fn, optimizer, batch_size=4, num_epochs=3):
     model.train()
     running_loss = 0.0
     loss = 0
+    batch_loss = []
     for epoch in range(num_epochs):
         for batch_idx, (images, labels) in enumerate(iter(dataloader)):
             optimizer.zero_grad()  # Reset gradients in every iteration
@@ -28,12 +30,16 @@ def train(model, datasetloader, loss_fn, optimizer, batch_size=4, num_epochs=3):
             loss.backward()
             optimizer.step()
 
+            batch_loss.append(loss)
+
             running_loss += loss.item()
             if batch_idx % 1000 == 999:
                 print("Epoch:{} Batch:{} loss: {}".format(epoch + 1, batch_idx + 1, running_loss / 2000))
                 running_loss = 0.0
-
-        print("Epoch {} done with loss {}".format(epoch + 1, loss))
+    plt.plot(batch_loss)
+    plt.xlabel('batch_loss')
+    plt.ylabel('epoch')
+    plt.show()
 
 
 def evaluate(model, datasetloader, loss_fn, batch_size=4):
@@ -75,7 +81,7 @@ if __name__ == "__main__":
                       transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
                       ]
 
-    dataloader = CIFARLoader(transform_list=transform_list)
+    dataloader = CIFARLoader(sample=False, transform_list=transform_list)
     loss_fn = nn.CrossEntropyLoss()
     optimizer = optim.SGD(net.parameters(), lr=1e-3, momentum=0.9)
 

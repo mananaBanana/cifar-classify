@@ -1,13 +1,6 @@
-import torch
-import torchvision
-
 import torch.nn as nn
 import torch.nn.functional as F
-import torchvision.transforms as transforms
-import torch.optim as optim
 
-import matplotlib.pyplot as ply
-import numpy as np
 
 class Net(nn.Module):
     def __init__(self, params):
@@ -20,7 +13,7 @@ class Net(nn.Module):
         self.pool_size = params["pool_size"]
         self.class_num = params["class_num"]
         self.kern_size = params["kern_size"]
-        self.layer_shape = [0, 0] # Shape after convulution
+        self.layer_shape = [0, 0]  # Shape after convulution
         self.batch_norm = params["batch_norm"]
 
         # Convulutional layers
@@ -36,7 +29,8 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(self.layer_shape[0] * self.layer_shape[1] * self.out_channels * 2, self.out_channels * 4)
         self.fc2 = nn.Linear(self.out_channels * 4, self.out_channels * 3)
         self.fc3 = nn.Linear(self.out_channels * 3, self.class_num)
-        
+
+
     def forward(self, s):
         s = F.max_pool2d(self.conv1(s), self.pool_size)
         s = F.relu(s)
@@ -51,8 +45,8 @@ class Net(nn.Module):
 
         return self.fc3(s)
 
-# Supporting functions
 
-def getsizeafterconv(imsize, filtsize, poolsize, filtstride = 1, poolstride = 2):
+# Supporting functions
+def getsizeafterconv(imsize, filtsize, poolsize, filtstride=1, poolstride=2):
     """ Get the input channel size after convolution and pooling"""
     return int((((imsize - filtsize) / filtstride + 1) - poolsize) / poolstride + 1)
